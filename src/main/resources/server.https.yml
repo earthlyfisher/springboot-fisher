@@ -1,0 +1,9 @@
+custom:
+    tomcat:
+        https:
+            port: 8443
+            secure: true
+            scheme: https
+            ssl: true
+            keystore: ${user.home}/.keystore
+            keystore-password: changeit

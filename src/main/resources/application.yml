@@ -1,0 +1,34 @@
+# Server settings (ServerProperties)
+server:
+  port: 8080
+  address: 127.0.0.1
+  sessionTimeout: 15
+  contextPath: /
+  
+#datasource
+spring:
+  profiles:
+    active: prod
+  jpa:
+    show-sql: true
+    hibernate:
+      # Hibernate ddl auto (create, create-drop, update)
+      ddl-auto: update
+      hibernate.format_sql: true
+  encoding:
+         charset: UTF-8
+         enabled: true
+         force: true
+  #main.banner-mode: off
+#info
+info:
+    app:
+        name: earthlyfisher
+        version: 1.0
+#log
+logging:
+   #file: D:\\image\\earthlyfihser.log
+   path: D:\\
+   level:
+      root: info
+      org.springframework.web: DEBUG

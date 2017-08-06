@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <title>用户管理 </title>
+    <meta name="description" content="fisher"/>
+    <meta name="author" content="fisher"/>
+    <meta name="keywords" content="fisher"/>
+</head>
+<body>
+<div class="content-body">
+    <div class="inner">
+        <div class="search-form clearfix">
+            <form class="form-inline" role="form">
+                <label class="sr-only" for="search">搜索</label>
+                <input type="email" class="form-control pull-left" id="search" placeholder="请输入用户名称进行搜索">
+                <div class="btn-search pull-left"></div>
+                <a data-toggle="modal" data-target="#mymodal-add" class="btn-add pull-left"
+                   onclick="loadRoleTrees()"><span
+                        class="glyphicon glyphicon-plus"></span></a>
+            </form>
+        </div>
+        <div class="table-content">
+            <table class="table table-bordered table-hover">
+                <thead>
+                <tr>
+                    <th class="col-xs-1">序号</th>
+                    <th class="col-xs-3">用户名</th>
+                    <th class="col-xs-3">年龄</th>
+                    <th class="col-xs-1">权限管理</th>
+                    <th class="col-xs-6">操作</th>
+                </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </div>
+        <div class="page">
+            <ul class="pagination pagination-sm">
+                <li><a href="#">&laquo;第一页</a></li>
+                <li class="active"><a href="#">1</a></li>
+                <li><a href="#">2</a></li>
+                <li><a href="#">3</a></li>
+                <li><a href="#">4</a></li>
+                <li><a href="#">5</a></li>
+                <li class="disabled"><a href="#">最后一页&raquo;</a></li>
+            </ul>
+            <div class="page-info pull-right">每页20条，总页数20页，共390条记录。</div>
+        </div>
+    </div>
+</div>
+
+<input type="hidden" value="" id="currentUserId"/>
+
+<!--删除弹出框-->
+<div class="modal fade" id="mymodal-delete" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span
+                        class="sr-only">Close</span></button>
+                <h4 class="modal-title">删除</h4>
+            </div>
+            <div class="modal-body">
+                <p>确定要删除吗？</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal" name="closeButton">关闭</button>
+                <button type="button" class="btn btn-primary" onclick="deleteUser_submit()">确定</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--修改弹出框-->
+<div class="modal fade" id="mymodal-modify" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog" style="width:800px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">用户管理</h4>
+            </div>
+            <form role="form" class="modal-body">
+                <div class="form clearfix">
+                    <div class="form-group">
+                        <input type="hidden" name="id" value=""/>
+                        <div class="col-xs-4 text-right"><label>用户名：</label></div>
+                        <div class="col-xs-5">
+                            <input type="text" name="name" class="form-control" placeholder="">
+                        </div>
+                        <div class="col-xs-5"></div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-xs-4 text-right"><label>年龄：</label></div>
+                        <div class="col-xs-5">
+                            <input type="text" name="age" class="form-control" placeholder="">
+                        </div>
+                        <div class="col-xs-5"></div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-xs-4 text-right"><label>角色：</label></div>
+                        <div class="col-xs-5">
+                            <ul id="roleList"></ul>
+                        </div>
+                        <div class="col-xs-5"></div>
+                    </div>
+                </div>
+            </form>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal" name="closeButton">关闭</button>
+                <button type="button" class="btn btn-primary" onclick="modifyUser_submit()">确定</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--权限管理弹出框-->
+<div class="modal fade" id="mymodal-role" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog" style="width:800px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">分配权限</h4>
+            </div>
+            <form role="form" class="modal-body">
+                <input type="hidden" name="id" value=""/>
+                <div class="form clearfix">
+                    <div class="form-group">
+                        <div class="col-xs-4 text-right"><label>菜单：</label></div>
+                        <div class="col-xs-5">
+                            <ul id="menuLst"></ul>
+                        </div>
+                        <div class="col-xs-5"></div>
+                    </div>
+                </div>
+            </form>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal" name="closeButton">关闭</button>
+                <button type="button" class="btn btn-primary" onclick="modifyMenu_submit()">确定</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--新增弹出框-->
+<div class="modal fade" id="mymodal-add" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog" style="width:800px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">用户管理</h4>
+            </div>
+            <form role="form" class="modal-body">
+                <div class="form clearfix">
+                    <div class="form-group">
+                        <div class="col-xs-4 text-right"><label>用户名：</label></div>
+                        <div class="col-xs-5">
+                            <input type="text" name="name" class="form-control" placeholder="">
+                        </div>
+                        <div class="col-xs-5"></div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-xs-4 text-right"><label>密码：</label></div>
+                        <div class="col-xs-5">
+                            <input type="password" name="password" class="form-control" placeholder="">
+                        </div>
+                        <div class="col-xs-5"></div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-xs-4 text-right"><label>密码确认：</label></div>
+                        <div class="col-xs-5">
+                            <input type="password" name="rePwd" class="form-control" placeholder="">
+                        </div>
+                        <div class="col-xs-5"></div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-xs-4 text-right"><label>年龄：</label></div>
+                        <div class="col-xs-5">
+                            <input type="text" name="age" class="form-control" placeholder="">
+                        </div>
+                        <div class="col-xs-5"></div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-xs-4 text-right"><label>角色：</label></div>
+                        <div class="col-xs-5">
+                            <ul id="addRoleList"></ul>
+                        </div>
+                        <div class="col-xs-5"></div>
+                    </div>
+                </div>
+            </form>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal" name="closeButton">关闭</button>
+                <button type="button" class="btn btn-primary" onclick="addUser_submit()">确定</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script type="text/javascript">
+    $(function () {
+        loadUserTables();
+    });
+
+    function deleteUser(id) {
+        $("#currentUserId").val(id);
+    }
+
+    <!--删除Role submit-->
+    function deleteUser_submit() {
+        var id = $("#currentUserId").val();
+        $.ajax({
+            url: "/users/" + id,
+            method: "DELETE",
+            dataType: "json",
+            async: false,
+            success: function (data) {
+                if (data.flag == "true") {
+                    loadUserTables();
+                } else {
+                    alert(data.errCode);
+                }
+                dismissModal();
+            }
+        });
+    }
+
+    <!--修改Menu准备属性-->
+    function modifyUser(id) {
+        $.ajax({
+            url: "/users/" + id,
+            method: "GET",
+            dataType: "json",
+            async: false,
+            success: function (data) {
+                $("#mymodal-modify input[name='id']").val(data.id);
+                $("#mymodal-modify input[name='name']").val(data.name);
+                $("#mymodal-modify input[name='age']").val(data.age);
+
+                //加载角色树
+                loadRoleTrees();
+
+                //设置已选的角色
+                var dataRoles = data.roles;
+                for (var i = 0; i < dataRoles.length; i++) {
+                    var target = $('#roleList').tree("find", dataRoles[i].id).target;
+                    $('#roleList').tree("check", target);
+                }
+            }
+        });
+    }
+
+    function modifyUser_submit() {
+        var nodes = $('#roleList').tree("getChecked");
+        var roles = [];
+        for (var i = 0; i < nodes.length; i++) {
+            roles[i] = nodes[i].id;
+        }
+
+        var id = $("#mymodal-modify input[name='id']").val();
+        var userData = {
+            user: {
+                id: id,
+                name: $("#mymodal-modify input[name='name']").val(),
+                age: $("#mymodal-modify input[name='age']").val()
+            },
+            roleIdLst: roles
+        };
+        $.ajax({
+            url: "/users/" + id,
+            method: "PUT",
+            contentType: "application/json",
+            dataType: "json",
+            async: false,
+            data: JSON.stringify(userData),
+            success: function (data) {
+                if (data.flag == "true") {
+                    loadUserTables();
+                } else {
+                    alert(data.errCode);
+                }
+                dismissModal();
+            }
+        });
+    }
+
+    function addUser_submit() {
+        var nodes = $('#addRoleList').tree("getChecked");
+        var roles = [];
+        for (var i = 0; i < nodes.length; i++) {
+            roles[i] = nodes[i].id;
+        }
+
+        var id = $("#mymodal-add input[name='id']").val();
+        var userData = {
+            user: {
+                id: id,
+                name: $("#mymodal-add input[name='name']").val(),
+                age: $("#mymodal-add input[name='age']").val(),
+                password: $("#mymodal-add input[name='password']").val()
+            },
+            rePwd: $("#mymodal-add input[name='rePwd']").val(),
+            roleIdLst: roles
+        };
+
+        $.ajax({
+            url: "/users/",
+            method: "POST",
+            contentType: "application/json",
+            dataType: "json",
+            async: false,
+            data: JSON.stringify(userData),
+            success: function (data) {
+                if (data.flag == "true") {
+                    loadUserTables();
+                } else {
+                    alert(data.errCode);
+                }
+                dismissModal();
+            }
+        });
+    }
+
+    //默认显示栏目列表
+    function loadUserTables() {
+        $.ajax({
+            url: "/users",
+            method: "GET",
+            dataType: "json",
+            async: false,
+            success: function (data) {
+                var userHtml = '';
+                for (var i = 0; i < data.length; i++) {
+                    userHtml += "<tr>";
+                    userHtml += "<td>" + (i + 1) + "</td>>";
+                    userHtml += "<td>" + data[i].name + "</td>>";
+                    userHtml += "<td>" + data[i].age + "</td>>";
+                    userHtml += "<td><div class='oper'> " +
+                        "<div class='edit' data-toggle='modal' data-target='#mymodal-role' onclick=\"loadMenus('" + data[i].id + "')\"><img src='../../img/edit.png'/></div>" +
+                        "</div></td>>";
+                    userHtml += "<td><div class='oper'> " +
+                        "<div class='edit' data-toggle='modal' data-target='#mymodal-modify' onclick=\"modifyUser('" + data[i].id + "')\"><img src='../../img/edit.png'/></div>" +
+                        "<div class='del' data-toggle='modal' data-target='#mymodal-delete' onclick=\"deleteUser('" + data[i].id + "')\"><img src='../../img/del.png'/></div>" +
+                        "</div></td>>";
+                    userHtml += "</tr>";
+                }
+                $('.table-content tbody').empty();
+                $('.table-content tbody').append(userHtml);
+            }
+        });
+    }
+
+    function modifyMenu_submit() {
+        var nodes = $('#menuLst').tree("getChecked");
+        var menus = [];
+        for (var i = 0; i < nodes.length; i++) {
+            menus[i] = nodes[i].id;
+        }
+
+        var userData = {
+            menuIdLst: menus
+        };
+
+        var id = $("#mymodal-role input[name='id']").val();
+        $.ajax({
+            url: "/users/" + id + "/permissions",
+            method: "PUT",
+            contentType: "application/json",
+            dataType: "json",
+            async: false,
+            data: JSON.stringify(userData),
+            success: function (data) {
+                if (data.flag == "true") {
+                    loadUserTables();
+                } else {
+                    alert(data.errCode);
+                }
+                dismissModal();
+            }
+        });
+    }
+
+    function loadMenus(id) {
+        $.ajax({
+            url: "/menus/trees",
+            method: "GET",
+            dataType: "json",
+            async: false,
+            success: function (data) {
+                $('#menuLst').tree({
+                    data: data,
+                    checkbox: true,
+                    formatter: function (node) {
+                        return node.menuName;
+                    },
+                    onCheck: function (node, checked) {
+                    },
+                    onLoadSuccess: function (node, data) {
+                        $.ajax({
+                            url: "/users/" + id + "/permissions",
+                            method: "GET",
+                            dataType: "json",
+                            async: false,
+                            success: function (data) {
+                                for (var i = 0; i < data.length; i++) {
+                                    var target = $('#menuLst').tree("find", data[i].id).target;
+                                    $('#menuLst').tree("check", target);
+                                }
+                            }
+                        });
+                    }
+                });
+            }
+        });
+
+        $("#mymodal-role input[name='id']").val(id);
+    }
+
+    function loadRoleTrees() {
+        var listData;
+        $.ajax({
+            url: "/roles",
+            method: "GET",
+            dataType: "json",
+            async: false,
+            success: function (data) {
+                listData = data;
+            }
+        });
+
+        $('#roleList').tree({
+            data: listData,
+            checkbox: true,
+            formatter: function (node) {
+                return node.roleName;
+            },
+            onCheck: function (node, checked) {
+            },
+            onLoadSuccess: function (node, data) {
+            }
+        });
+
+        $('#addRoleList').tree({
+            data: listData,
+            checkbox: true,
+            formatter: function (node) {
+                return node.roleName;
+            },
+            onCheck: function (node, checked) {
+            },
+            onLoadSuccess: function (node, data) {
+            }
+        });
+    }
+
+    //dismiss modal
+    function dismissModal() {
+        $("button[name='closeButton']").click();
+    }
+</script>
+</body>
+</html>

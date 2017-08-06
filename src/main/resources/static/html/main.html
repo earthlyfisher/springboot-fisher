@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <title>网站首页 </title>
+    <meta name="description" content="fisher"/>
+    <meta name="author" content="fisher"/>
+    <meta name="keywords" content="fisher"/>
+    <!-- core CSS -->
+    <link href="../css/bootstrap.min.css" rel="stylesheet">
+    <link href="../css/animate.min.css" rel="stylesheet">
+    <link href="../css/main.css" rel="stylesheet">
+    <link href="../css/responsive.css" rel="stylesheet">
+    <link href="../css/font-awesome.min.css" rel="stylesheet">
+    <link href="../css/easyui.css" rel="stylesheet" type="text/css"/>
+    <link rel="shortcut icon" href="../ico/favicon.png"/>
+</head>
+<body>
+<div class="wrapper">
+    <div id="header">
+        <a href="index.html" class="logo"></a>
+        <nav class="navbar">
+            <a class="sidebar-toggle" href="javascript:;"><i class="fa fa-bars"></i></a>
+            <ul class="nav navbar-nav">
+                <li class="globe-select">
+                    <a style="background: url(../img/cir-CN.png) no-repeat center center;" href="javascript:;"></a>
+                    <ul class="globe-option">
+                        <li><a style="background: url(../img/cir-CN.png) no-repeat center left;" href="javascript:;">简体中文</a>
+                        </li>
+                        <li><a style="background: url(../img/cir-CN.png) no-repeat center left;" href="javascript:;">繁體中文</a>
+                        </li>
+                        <li><a style="background: url(../img/cir-GB.png) no-repeat center left;" href="javascript:;">English</a>
+                        </li>
+                    </ul>
+                </li>
+                <li><a href="index.html" title="主页"><i class="fa fa-home"></i></a></li>
+                <li><a href="javascript:;" title="刷新"><i class="fa fa-refresh"></i></a></li>
+                <li><a href="javascript:void(0);" onclick="logout()" title="退出"><i class="fa fa-sign-out"></i></a></li>
+            </ul>
+        </nav>
+    </div>
+    <div class="main-sidebar">
+        <div class="current-user clearfix">
+            <div class="pull-left image"><img class="img-circle" src="../img/user.png"/></div>
+            <div class="pull-left info">
+                <p>Admin</p>
+                <p>系统管理员</p>
+            </div>
+        </div>
+        <ul class="nav nav-pills nav-stacked" id="MenuMainManager">
+        </ul>
+    </div>
+    <div id="content" class="content-wrapper">
+        <div class="content-header" id="contentHeader">
+        </div>
+        <div class="content-body" id="contentBody">
+
+        </div>
+    </div>
+    <div class="footer">
+        <strong>&copy; 2015 Earthlyfisher</strong>
+    </div>
+</div>
+<!-- end footer -->
+<script src="../js/jquery.js"></script>
+<script src="../js/bootstrap.min.js"></script>
+<script src="../js/main.js"></script>
+<script src="../js/jquery.easyui.min.js"></script>
+<script type="text/javascript">
+    $(function () {
+        $.ajax({
+            url: "/users/menus",
+            method: "GET",
+            dataType: "json",
+            async: false,
+            success: function (data) {
+                var menuHtml = '';
+                for (var i = 0; i < data.length; i++) {
+                    if (i == 0) {
+                        menuHtml += '<li class="active">' +
+                            "<a onclick=\"loadContent('" + data[i].staticIndex + "','" + data[i].menuName + "'," + data[i].id + ")\" role=\"tab\"> " +
+                            '<i class="fa fa-dashboard"></i> ' +
+                            '<span>' + data[i].menuName + '</span> ' +
+                            '</a> ' +
+                            '</li>'
+                    } else {
+                        menuHtml += ' <li class="dropdown">' +
+                            ' <a href="javascript:;" class="dropdown-toggle" data-toggle="dropdown">' +
+                            ' <i class="fa fa-dashboard"></i>' +
+                            '<span>' + data[i].menuName + '</span> ' +
+                            '<i class="fa fa-angle-down pull-right"></i></a>';
+                        menuHtml += compose(data[i].children, data[i].menuName);
+                    }
+                }
+                $('#MenuMainManager').append(menuHtml);
+                loadContent(data[0].staticIndex, data[0].menuName, data[0].id);
+            },
+            error: function (XMLHttpRequest) {
+                if (XMLHttpRequest.status == 200 && XMLHttpRequest.readyState == 4) {
+                    window.location.href = location.protocol + "//" + location.hostname + ":" + location.port + "/login.html";
+                } else {
+                    alert("Failed")
+                }
+            }
+        });
+    });
+
+    //退出
+    function logout() {
+        $.ajax({
+            url: "/users/logout",
+            method: "PUT",
+            contentType: "application/json",
+            dataType: "json",
+            async: false,
+            success: function (data) {
+                if (data.flag == "true") {
+                    window.location.href = location.protocol + "//" + location.hostname + ":" + location.port + "/login.html";
+                } else {
+                    alert(data.errCode);
+                }
+            }
+        });
+    }
+
+
+    function compose(children, parentName) {
+        var childMenuHtml = '<ul class="dropdown-menu">';
+        for (var i = 0; i < children.length; i++) {
+            childMenuHtml += ' <li>' +
+                "<a onclick=\"loadContent('" + children[i].staticIndex + "','" + children[i].menuName + "'," + children[i].id + ",'" + parentName + "')\"> " +
+                '<i class="fa fa-circle-o"></i><span>' + children[i].menuName + '</span></a></li>'
+        }
+        childMenuHtml += '</ul>';
+        return childMenuHtml;
+    }
+
+    function loadContent(url, name, id, parentName) {
+        var headHtml;
+        if (id == 1) {
+            headHtml = '<h1>欢迎页 <small>欢迎回来</small> </h1> <ol class="breadcrumb"> ' +
+                '<li><a href="index.html"><i class="fa fa-dashboard"></i>首页</a></li> ' +
+                '<li class="active">欢迎页</li></ol>';
+        } else {
+            headHtml = '<h1>' + parentName + ' <small>' + name + '</small> </h1> <ol class="breadcrumb"> ' +
+                '<li><a href="javascript:;"><i class="fa fa-dashboard"></i>' + parentName + '</a></li> ' +
+                '<li class="active">' + name + '</li></ol>';
+        }
+
+        $("#contentHeader").empty();
+        $("#contentHeader").append(headHtml);
+        $("#contentBody").load(url);
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,26 @@
+spring:
+  datasource:
+    driver-class-name: org.h2.Driver
+    url: jdbc:h2:mem:AZ;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    username: sa
+    password:
+    max-active: 10
+    max-idle: 5
+    min-idle: 0
+    #data: classpath:/database/import.sql  #初始化数据文件地址
+  jpa:
+    database: H2
+    properties.hibernate.dialect: org.hibernate.dialect.H2Dialect
+#以下主要测试给bean赋值
+my:
+  secret: test_secret
+  number: ${random.int}
+  bignumber: ${random.long}
+  uuid: ${random.uuid}
+  number.less.than.ten: ${random.int(10)}
+  number.in.range: ${random.int[1024,65536]}
+#以下主要测试给bean赋值
+student:
+    id: 1234567890
+    name: Gavin wang
+    age: 30

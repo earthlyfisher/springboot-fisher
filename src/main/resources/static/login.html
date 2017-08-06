@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <title>网站首页 </title>
+    <meta name="description" content="fisher"/>
+    <meta name="author" content="fisher"/>
+    <meta name="keywords" content="fisher"/>
+    <!-- core CSS -->
+    <link rel="stylesheet" type="text/css" href="css/login.css"/>
+    <link rel="shortcut icon" href="ico/favicon.png"/>
+    <script src="js/angular-1.6.2/angular.js"></script>
+    <script src="js/fisher.js"></script>
+</head>
+<body>
+<div ng-app="myApp" ng-controller="formCtrl">
+    <form novalidate class="login-form" autocomplete="off">
+        <div class="login-area">
+            <div class="login-logo"><img src="img/logo.png"/></div>
+            <div class="login-body">
+                <div class="form-group">
+                    <span class="icon-user"></span>
+                    <input name="" type="text" class="input-control" placeholder="用户名" ng-model="name">
+                </div>
+                <div class="form-group">
+                    <span class="icon-lock"></span>
+                    <input name="" type="password" id="tbPassword" class="input-control" placeholder="密码"
+                           ng-model="password">
+                </div>
+                <div class="form-group remember-me"><span class="checkbox"></span> 记住我</div>
+                <div class="form-group">
+                    <button class="btn-blue" ng-click="login()">登陆</button>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+<script type="text/javascript">
+    var app = angular.module('myApp', []);
+    app.controller('formCtrl', function ($scope, $http, $location) {
+        var ROOT_URL = $location.path();
+        $scope.login = function () {
+            var loginData = {
+                name: $scope.name,
+                password: $scope.password
+            };
+
+            $http({
+                method: 'POST',
+                url: ROOT_URL + "/users/login",
+                data: loginData
+            }).then(function (response) {
+                if (response.data.flag == "true") {
+                    window.location.href = ROOT_URL + "/html/main.html";
+                } else {
+                    alert("username or password is error!")
+                }
+            });
+        }
+    });
+</script>
+</body>
+</html>

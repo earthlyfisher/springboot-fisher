@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <title>菜单管理 </title>
+    <meta name="description" content="fisher"/>
+    <meta name="author" content="fisher"/>
+    <meta name="keywords" content="fisher"/>
+</head>
+<body>
+<div class="content-body">
+    <div class="inner">
+        <div class="search-form clearfix">
+            <form class="form-inline" role="form">
+                <label class="sr-only" for="search">搜索</label>
+                <input type="email" class="form-control pull-left" id="search" placeholder="请输入菜单名称进行搜索">
+                <div class="btn-search pull-left"></div>
+                <a data-toggle="modal" data-target="#mymodal-add" class="btn-add pull-left"
+                   onclick="setRootMenus()"><span
+                        class="glyphicon glyphicon-plus"></span></a>
+            </form>
+        </div>
+        <div class="table-content">
+            <table class="table table-bordered table-hover">
+                <thead>
+                <tr>
+                    <th class="col-xs-1">序号</th>
+                    <th class="col-xs-2">名称</th>
+                    <th class="col-xs-2">上级</th>
+                    <th class="col-xs-3">索引</th>
+                    <th class="col-xs-1">顺序</th>
+                    <th class="col-xs-1">状态</th>
+                    <th class="col-xs-6">操作</th>
+                </tr>
+                </thead>
+                <tbody>
+                <!-- <tr>
+                     <td>1</td>
+                     <td>首页</td>
+                     <td>首页的上级</td>
+                     <td>/Admin/Home/Index</td>
+                     <td>顺序</td>
+                     <td>状态</td>
+                     <td>
+                         <div class="oper">
+                             <div class="edit"><a href="menuManageAdd.html" onclick="modifyMenu()"><img
+                                     src="../img/edit.png"/></a></div>
+                             <div class="del" data-toggle="modal" data-target="#mymodal-data"><img
+                                     src="../img/del.png"/></div>
+                         </div>
+                     </td>
+                 </tr>-->
+                </tbody>
+            </table>
+        </div>
+        <div class="page">
+            <ul class="pagination pagination-sm">
+                <li><a href="#">&laquo;第一页</a></li>
+                <li class="active"><a href="#">1</a></li>
+                <li><a href="#">2</a></li>
+                <li><a href="#">3</a></li>
+                <li><a href="#">4</a></li>
+                <li><a href="#">5</a></li>
+                <li class="disabled"><a href="#">最后一页&raquo;</a></li>
+            </ul>
+            <div class="page-info pull-right">每页20条，总页数20页，共390条记录。</div>
+        </div>
+    </div>
+</div>
+
+<input type="hidden" value="" id="currentMenuId"/>
+
+<!--删除弹出框-->
+<div class="modal fade" id="mymodal-delete" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span
+                        class="sr-only">Close</span></button>
+                <h4 class="modal-title">删除</h4>
+            </div>
+            <div class="modal-body">
+                <p>确定要删除吗？</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal" name="closeButton">关闭</button>
+                <button type="button" class="btn btn-primary" onclick="deleteMemu_submit()">确定</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--修改弹出框-->
+<div class="modal fade" id="mymodal-modify" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog" style="width:800px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">栏目管理</h4>
+            </div>
+            <form role="form" class="modal-body">
+                <div class="form clearfix">
+                    <div class="form-group">
+                        <input type="hidden" name="id" value=""/>
+                        <div class="col-xs-4 text-right"><label>栏目名称：</label></div>
+                        <div class="col-xs-5">
+                            <input type="text" name="menuName" class="form-control" placeholder="请输入栏目名称">
+                        </div>
+                        <div class="col-xs-5"></div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-xs-4 text-right"><label>栏目描述：</label></div>
+                        <div class="col-xs-5">
+                            <input type="text" name="menuDesc" class="form-control" placeholder="请输入栏目描述">
+                        </div>
+                        <div class="col-xs-5"></div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-xs-4 text-right"><label>上级栏目：</label></div>
+                        <div class="col-xs-5">
+                            <select class="form-control" name="parantId">
+                                <option value="-1" selected="selected">顶级目录</option>
+                                <option>上级栏目2</option>
+                                <option>上级栏目3</option>
+                            </select>
+                        </div>
+                        <div class="col-xs-5"></div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-xs-4 text-right"><label>显示顺序(1-10)：</label></div>
+                        <div class="col-xs-5">
+                            <input type="text" name="priority" class="form-control" placeholder="请输入显示顺序">
+                        </div>
+                        <div class="col-xs-5"></div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-xs-4 text-right"><label>栏目索引：</label></div>
+                        <div class="col-xs-5">
+                            <input type="text" name="staticIndex" class="form-control" placeholder="请输入页面索引">
+                        </div>
+                        <div class="col-xs-5"></div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-xs-4 text-right"><label>显示状态：</label></div>
+                        <div class="col-xs-5">
+                            <select class="form-control" name="enabled">
+                                <option value="true">活动</option>
+                                <option value="false">隐藏</option>
+                            </select>
+                        </div>
+                        <div class="col-xs-5"></div>
+                    </div>
+                </div>
+            </form>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal" name="closeButton">关闭</button>
+                <button type="button" class="btn btn-primary" onclick="modifyMenu_submit()">确定</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--新增弹出框-->
+<div class="modal fade" id="mymodal-add" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog" style="width:800px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">栏目管理</h4>
+            </div>
+            <form role="form" class="modal-body">
+                <div class="form clearfix">
+                    <div class="form-group">
+                        <div class="col-xs-4 text-right"><label>栏目名称：</label></div>
+                        <div class="col-xs-5">
+                            <input type="text" name="menuName" class="form-control" placeholder="请输入栏目名称">
+                        </div>
+                        <div class="col-xs-5"></div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-xs-4 text-right"><label>栏目描述：</label></div>
+                        <div class="col-xs-5">
+                            <input type="text" name="menuDesc" class="form-control" placeholder="请输入栏目描述">
+                        </div>
+                        <div class="col-xs-5"></div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-xs-4 text-right"><label>上级栏目：</label></div>
+                        <div class="col-xs-5">
+                            <select class="form-control" name="parantId">
+                            </select>
+                        </div>
+                        <div class="col-xs-5"></div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-xs-4 text-right"><label>显示顺序(1-10)：</label></div>
+                        <div class="col-xs-5">
+                            <input type="text" name="priority" class="form-control" placeholder="请输入显示顺序">
+                        </div>
+                        <div class="col-xs-5"></div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-xs-4 text-right"><label>栏目索引：</label></div>
+                        <div class="col-xs-5">
+                            <input type="text" name="staticIndex" class="form-control" placeholder="请输入页面索引">
+                        </div>
+                        <div class="col-xs-5"></div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-xs-4 text-right"><label>显示状态：</label></div>
+                        <div class="col-xs-5">
+                            <select class="form-control" name="enabled">
+                                <option value="true" selected="selected">活动</option>
+                                <option value="false">隐藏</option>
+                            </select>
+                        </div>
+                        <div class="col-xs-5"></div>
+                    </div>
+                </div>
+            </form>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal" name="closeButton">关闭</button>
+                <button type="button" class="btn btn-primary" onclick="addMenu_submit()">确定</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script type="text/javascript">
+    $(function () {
+        loadMenuTables();
+    });
+
+    /**
+     //通过监听modal事件赋值,不成功还需再研究
+     $("#mymodal-delete").on('show.bs.modal', function (event) {
+        var deleteButton = $(event.relatedTarget);
+        $("#deleteId").val();
+    });
+     **/
+
+    function deleteMemu(id) {
+        $("#currentMenuId").val(id);
+    }
+
+    <!--删除Menu submit-->
+    function deleteMemu_submit() {
+        var id = $("#currentMenuId").val();
+        $.ajax({
+            url: "/menus/" + id,
+            method: "DELETE",
+            dataType: "json",
+            async: false,
+            success: function (data) {
+                if (data.flag == "true") {
+                    loadMenuTables();
+                } else {
+                    alert(data.errCode);
+                }
+                dismissModal();
+            }
+        });
+    }
+
+    <!--修改Menu准备属性-->
+    function modifyMenu(id) {
+        setRootMenus();
+        //set selected menu properties
+        $.ajax({
+            url: "/menus/" + id,
+            method: "GET",
+            dataType: "json",
+            async: false,
+            success: function (data) {
+                $("#mymodal-modify input[name='id']").val(data.id);
+                $("#mymodal-modify input[name='menuName']").val(data.menuName);
+                $("#mymodal-modify input[name='menuDesc']").val(data.menuDesc);
+                if (data.parantId != 0) {
+                    $("#mymodal-modify select[name='parantId']").val(data.parantId);
+                }
+                $("#mymodal-modify input[name='priority']").val(data.priority);
+                $("#mymodal-modify input[name='staticIndex']").val(data.staticIndex);
+                if (data.enabled) {
+                    $("#mymodal-modify select[name='enabled']").val("true");
+                } else {
+                    $("#mymodal-modify select[name='enabled']").val("false");
+                }
+            }
+        });
+    }
+
+    function modifyMenu_submit() {
+        var id = $("#mymodal-modify input[name='id']").val();
+        var menuData = {
+            id: id,
+            menuName: $("#mymodal-modify input[name='menuName']").val(),
+            menuDesc: $("#mymodal-modify input[name='menuDesc']").val(),
+            parantId: $("#mymodal-modify select[name='parantId']").val(),
+            priority: $("#mymodal-modify input[name='priority']").val(),
+            staticIndex: $("#mymodal-modify input[name='staticIndex']").val(),
+            enabled: $("#mymodal-modify select[name='enabled']").val()
+        };
+        $.ajax({
+            url: "/menus/" + id,
+            method: "PUT",
+            contentType: "application/json",
+            dataType: "json",
+            async: false,
+            data: JSON.stringify(menuData),
+            success: function (data) {
+                if (data.flag == "true") {
+                    loadMenuTables();
+                } else {
+                    alert(data.errCode);
+                }
+                dismissModal();
+            }
+        });
+    }
+
+    function addMenu_submit() {
+        var menuData = {
+            menuName: $("#mymodal-add input[name='menuName']").val(),
+            menuDesc: $("#mymodal-add input[name='menuDesc']").val(),
+            parantId: $("#mymodal-add select[name='parantId']").val(),
+            priority: $("#mymodal-add input[name='priority']").val(),
+            staticIndex: $("#mymodal-add input[name='staticIndex']").val(),
+            enabled: $("#mymodal-add select[name='enabled']").val()
+        };
+        $.ajax({
+            url: "/menus/",
+            method: "POST",
+            contentType: "application/json",
+            dataType: "json",
+            async: false,
+            data: JSON.stringify(menuData),
+            success: function (data) {
+                alert(data);
+                if (data.flag == "true") {
+                    loadMenuTables();
+                } else {
+                    alert(data.errCode);
+                }
+                dismissModal();
+            }
+        });
+    }
+
+    //默认显示栏目列表
+    function loadMenuTables() {
+        $.ajax({
+            url: "/menus",
+            method: "GET",
+            dataType: "json",
+            async: false,
+            success: function (data) {
+                var menuHtml = '';
+                for (var i = 0; i < data.length; i++) {
+                    menuHtml += "<tr>";
+                    menuHtml += "<td>" + (i + 1) + "</td>>";
+                    menuHtml += "<td>" + data[i].menuName + "</td>>";
+                    menuHtml += "<td>" + data[i].parantName + "</td>>";
+                    menuHtml += "<td>" + data[i].staticIndex + "</td>>";
+                    menuHtml += "<td>" + data[i].priority + "</td>>";
+                    menuHtml += "<td>" + data[i].enabled + "</td>>";
+                    menuHtml += "<td><div class='oper'> " +
+                        "<div class='edit' data-toggle='modal' data-target='#mymodal-modify' onclick=\"modifyMenu('" + data[i].id + "')\"><img src='../../img/edit.png'/></div>" +
+                        "<div class='del' data-toggle='modal' data-target='#mymodal-delete' onclick=\"deleteMemu('" + data[i].id + "')\"><img src='../../img/del.png'/></div>" +
+                        "</div></td>>";
+                    menuHtml += "</tr>";
+                }
+                $('.table-content tbody').empty();
+                $('.table-content tbody').append(menuHtml);
+            }
+        });
+    }
+
+    //compose menu root trees
+    function setRootMenus() {
+        $.ajax({
+            url: "/menus/root",
+            method: "GET",
+            dataType: "json",
+            async: false,
+            success: function (data) {
+                var html = '<option value="0" selected="selected">根目录</option>';
+                for (var i = 0; i < data.length; i++) {
+                    html += "<option value='" + data[i].id + "'>" + data[i].menuName + "</option>";
+                }
+                $("#mymodal-modify select[name='parantId']").empty();
+                $("#mymodal-modify select[name='parantId']").append(html);
+                $("#mymodal-add select[name='parantId']").empty();
+                $("#mymodal-add select[name='parantId']").append(html);
+            }
+        });
+    }
+
+    //dismiss modal
+    function dismissModal() {
+        $("button[name='closeButton']").click();
+    }
+</script>
+</body>
+</html>

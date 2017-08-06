@@ -1,0 +1,10 @@
+# Auto Configuration
+
+
+#PropertySourceLoader
+org.springframework.boot.env.PropertySourceLoader=\
+com.wyp.boot.earthlyfisher.system.CustomPropertySourceLoader
+
+# Environment Post Processor
+org.springframework.boot.env.EnvironmentPostProcessor=\
+com.wyp.boot.earthlyfisher.system.CustomeEnvironmentPostProcessor

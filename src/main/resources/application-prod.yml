@@ -1,0 +1,24 @@
+spring:
+  datasource:
+      driver-class-name: com.mysql.jdbc.Driver
+      url: jdbc:mysql://localhost:3306/springboot?useUnicode=true&amp;characterEncoding=utf-8
+      username: root
+      password: 1234pwd
+      max-active: 10
+      max-idle: 5
+      min-idle: 0
+      #data: classpath:/database/import.sql  #初始化数据文件地址
+  jpa:
+    database: MYSQL
+    properties.hibernate.dialect: org.hibernate.dialect.MySQL5Dialect
+my:
+  secret: test_secret
+  number: ${random.int}
+  bignumber: ${random.long}
+  uuid: ${random.uuid}
+  number.less.than.ten: ${random.int(10)}
+  number.in.range: ${random.int[1024,65536]}
+student:
+  id: 1234567890
+  name: Gavin wang
+  age: 30
